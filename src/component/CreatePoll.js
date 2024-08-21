@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
@@ -20,12 +20,13 @@ const CreatePoll = () => {
   let addDataToServer = async (pollData) => {
     try {
       let response = await axios.post(
-        "https://real-time-polling-system-9fdf3-default-rtdb.firebaseio.com/polls.json",
+        `https://real-time-polling-system-9fdf3-default-rtdb.firebaseio.com/polls/.json`,
         pollData
       );
       if (response.status === 200) {
         // alert("Create poll successfully");
-        navigate("/voting");
+        console.log(response.data.name);
+        navigate(`/vote/${response.data.name}`);
       }
     } catch (error) {
       alert(error);
@@ -36,7 +37,9 @@ const CreatePoll = () => {
     e.preventDefault();
     let pollData = {
       question,
-      options: options.filter((option) => option.trim() !== ""),
+      options: options
+        .filter((option) => option.trim() !== "")
+        .map((option) => ({ text: option, votes: 0 })),
     };
     // console.log(pollData);
     if (pollData.question.length > 0 && pollData.options.length > 0) {
